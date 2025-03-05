@@ -6,7 +6,7 @@ import numpy as np
 
 # UK cities data
 uk_cities = [
-    ("London", 51.5074, -0.1278, 1000),
+    ("London", 51.5074, -0.1278, 300),
     ("Birmingham", 52.4862, -1.8904, 158),
     ("Manchester", 53.4808, -2.2426, 20),
     ("Edinburgh", 55.9533, -3.1883, 258),
