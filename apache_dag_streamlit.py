@@ -75,7 +75,7 @@ st.pydeck_chart(pdk.Deck(
             data=data,
             get_position='[lon, lat]',
             get_color='color',
-            get_radius='forest_size',
+            get_radius='population',
             pickable=True,
             auto_highlight=True,
             opacity=0.8,
