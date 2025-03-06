@@ -44,7 +44,7 @@ uk_cities = [
 # Create DataFrame
 data = pd.DataFrame(uk_cities, columns=['name', 'lat', 'lon', 'population', 'forest_coverage'])
 data['forest_size'] = data['forest_coverage'] * 100  # Scale for visibility
-data['population_size'] = data['population'] / 10000  # Scale for visibility
+data['population_size'] = data['population'] / 1000  # Scale for visibility
 
 # Color scale function
 def get_color(size):
