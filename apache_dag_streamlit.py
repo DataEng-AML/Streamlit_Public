@@ -1,81 +1,75 @@
-# Test Streamlit App
 import streamlit as st
+import folium
+import math
 import pandas as pd
-import pydeck as pdk
-import numpy as np
+import geopandas as gpd
+import matplotlib.pyplot as plt
+from folium.plugins import HeatMap
+from streamlit_folium import st_folium
 
-# UK cities data
-uk_cities = [
-    ("London", 51.5074, -0.1278, 10),
-    ("Birmingham", 52.4862, -1.8904, 158),
-    ("Manchester", 53.4808, -2.2426, 20),
-    ("Edinburgh", 55.9533, -3.1883, 258),
-    ("Glasgow", 55.8642, -4.2518, 30),
-    ("Liverpool", 53.4084, -2.9916, 188),
-    ("Leeds", 53.8008, -1.5491, 22),
-    ("Sheffield", 53.3811, -1.4701, 28),
-    ("Bristol", 51.4545, -2.5879, 17),
-    ("Newcastle", 54.9783, -1.6178, 23),
-    ("Cardiff", 51.4816, -3.1791, 198),
-    ("Belfast", 54.5973, -5.9301, 21),
-    ("Nottingham", 52.9548, -1.1581, 16),
-    ("Leicester", 52.6369, -1.1398, 148),
-    ("Coventry", 52.4068, -1.5197, 13)
-]
+# Streamlit UI
+st.title("UK Local Authority Data Dashboard")
+st.subheader("Analysis of Manufacturing Data Across Local Authorities")
+st.write("This dashboard provides a visualization of manufacturing activity across the UK local authorities, including a ranked bar chart and an interactive map.")
 
-# Create DataFrame
-data = pd.DataFrame(uk_cities, columns=['name', 'lat', 'lon', 'forest_coverage'])
-data['forest_size'] = data['forest_coverage'] * 100  # Scale for visibility
+# File upload for datasets
+st.write("### Upload Data Files")
+data_file = st.file_uploader("Upload CSV Data File", type=["csv"])
+geojson_file = st.file_uploader("Upload GeoJSON File", type=["geojson"])
 
-# Color scale function
-def get_color(size):
-    r = int(255 * (1 - size/data['forest_coverage'].max()))
-    g = int(255 * (size/data['forest_coverage'].max()))
-    return [r, g, 0, 200]
-
-data['color'] = data['forest_coverage'].apply(get_color)
-
-st.title("UK Forest Coverage Map")
-
-# Sidebar controls
-st.sidebar.header("Map Controls")
-zoom_level = st.sidebar.slider("Zoom Level", 5, 15, 6)
-pitch = st.sidebar.slider("Pitch", 0, 60, 40)
-
-# Create the map
-st.pydeck_chart(pdk.Deck(
-    map_style='mapbox://styles/mapbox/light-v9',
-    initial_view_state=pdk.ViewState(
-        latitude=54.5,  # Centered on UK
-        longitude=-4.0,
-        zoom=zoom_level,
-        pitch=pitch,
-    ),
-    layers=[
-        pdk.Layer(
-            'ScatterplotLayer',
-            data=data,
-            get_position='[lon, lat]',
-            get_color='color',
-            get_radius='forest_size',
-            pickable=True,
-            auto_highlight=True,
-            opacity=0.8,
-        ),
-    ],
-    tooltip={
-        'html': '<b>{name}</b><br>Forest Coverage: {forest_coverage}%',
-        'style': {
-            'backgroundColor': 'steelblue',
-            'color': 'white'
-        }
-    }
-))
-
-# Display data table
-st.subheader("Forest Coverage Data")
-st.dataframe(data[['name', 'forest_coverage']])
-
-# Add a chart
-st.subheader("Forest Coverage by City")
-st.bar_chart(data.set_index('name')['forest_coverage'])
+if data_file and geojson_file:
+    # Load the data
+    data = pd.read_csv(data_file, header=0)
+    
+    # Load the UK local authority boundaries shapefile
+    gdf = gpd.read_file(geojson_file)
+    
+    # Merge the data with the geopandas dataframe
+    merged = gdf.merge(data, left_on='LAD24CD', right_on='area code')
+    
+    # Dropdown to select category
+    category_options = ["Total specific manufacturing", "Total specific and related manufacturing"]
+    category = st.selectbox("Select Category to Visualize:", category_options)
+    
+    # Aggregate data by ITL2 code
+    grouped_data = merged.groupby("ITL2 code")[category].sum().reset_index()
+    
+    # Create two columns
+    col1, col2 = st.columns([1, 2])
+    
+    # Bar chart of top 10 values
+    with col1:
+        st.write("### Top 10 ITL2 Regions by Manufacturing Value")
+        top_10 = grouped_data.nlargest(10, category)
+        fig, ax = plt.subplots()
+        ax.barh(top_10['ITL2 code'], top_10[category], color='skyblue')
+        ax.set_xlabel("Manufacturing Value")
+        ax.set_ylabel("ITL2 Code")
+        ax.invert_yaxis()
+        st.pyplot(fig)
+    
+    # Interactive map
+    with col2:
+        st.write("### Interactive Map of Manufacturing Data")
+        m = folium.Map(location=[55.3781, -3.4360], zoom_start=6)
+        
+        # Add circles for the selected category
+        for _, row in merged.iterrows():
+            value = row[category]
+            if value > 0:
+                radius = math.sqrt(value) * 0.2  # Adjust the factor to control circle size
+                folium.CircleMarker(
+                    location=[row['geometry'].centroid.y, row['geometry'].centroid.x],
+                    radius=radius,
+                    color='red',
+                    fill=True,
+                    fill_color='red',
+                    fill_opacity=0.7,
+                    popup=f"{row['local authority: district / unitary (as of April 2023)']}<br>{category}: {value}",
+                    tooltip=f"{row['local authority: district / unitary (as of April 2023)']}<br>{category}: {value}"
+                ).add_to(m)
+        
+        folium.LayerControl().add_to(m)
+        st_folium(m, width=700, height=500)
+else:
+    st.write("Please upload both the data CSV file and the GeoJSON file to proceed.")
