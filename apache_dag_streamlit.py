@@ -1,75 +1,120 @@
 import streamlit as st
-import folium
-import math
 import pandas as pd
-import geopandas as gpd
 import matplotlib.pyplot as plt
-from folium.plugins import HeatMap
-from streamlit_folium import st_folium
+from io import StringIO
 
-# Streamlit UI
-st.title("UK Local Authority Data Dashboard")
-st.subheader("Analysis of Manufacturing Data Across Local Authorities")
-st.write("This dashboard provides a visualization of manufacturing activity across the UK local authorities, including a ranked bar chart and an interactive map.")
+# Function to display basic data overview
+def data_overview(data):
+    st.subheader("Data Overview")
+    st.write("Head of dataset:")
+    st.write(data.head())  # Corrected: Call data.head() as a function
+    st.write("Tail of dataset:")
+    st.write(data.tail())  # Corrected: Call data.tail() as a function
+    st.write("General Info of dataset:")
+    
+    # Capturing the output of data.info() to display it properly
+    buffer = StringIO()
+    data.info(buf=buffer)
+    s = buffer.getvalue()
+    st.text(s)  # Display info about the dataframe
 
-# File upload for datasets
-st.write("### Upload Data Files")
-data_file = st.file_uploader("Upload CSV Data File", type=["csv"])
-geojson_file = st.file_uploader("Upload GeoJSON File", type=["geojson"])
+    st.write("Columns in the dataset:")
+    st.write(data.columns)
 
-if data_file and geojson_file:
-    # Load the data
-    data = pd.read_csv(data_file, header=0)
+# Data cleaning function
+def data_cleaning(data):
+    st.subheader("Data Cleaning")
+    # Convert 'Price per Unit' to float after removing '$'
+    data['Price per Unit'] = data['Price per Unit'].str.replace('$', "").astype(float)
+    st.write("After cleaning 'Price per Unit':")
+    st.write(data.head(1)) 
     
-    # Load the UK local authority boundaries shapefile
-    gdf = gpd.read_file(geojson_file)
+    # Convert 'Units Sold', 'Total Sales', 'Operating Profit' to integers after removing commas and '$'
+    data['Units Sold'] = data['Units Sold'].str.replace(',', "").astype(int)
+    data['Total Sales'] = data['Total Sales'].str.replace('$', "").str.replace(',', "").astype(int)
+    data['Operating Profit'] = data['Operating Profit'].str.replace('$', "").str.replace(',', "").astype(int)
+    st.write("After cleaning 'Units Sold', 'Total Sales', 'Operating Profit':")
+    st.write(data.head(1)) 
     
-    # Merge the data with the geopandas dataframe
-    merged = gdf.merge(data, left_on='LAD24CD', right_on='area code')
+    # Rename columns to include "$"
+    data.rename(columns={"Price per Unit": "Price per Unit($)"}, inplace=True)
+    data.rename(columns={"Total Sales": "Total Sales($)"}, inplace=True)
+    data.rename(columns={"Operating Profit": "Operating Profit($)"}, inplace=True)
     
-    # Dropdown to select category
-    category_options = ["Total specific manufacturing", "Total specific and related manufacturing"]
-    category = st.selectbox("Select Category to Visualize:", category_options)
+    # Convert 'Invoice Date' to datetime and set it as index
+    data['Invoice Date'] = pd.to_datetime(data['Invoice Date'])
+    data = data.set_index(['Invoice Date'])  
     
-    # Aggregate data by ITL2 code
-    grouped_data = merged.groupby("ITL2 code")[category].sum().reset_index()
+    st.write("Data after cleaning and setting 'Invoice Date' as index:")
+    st.write(data.head(5))
     
-    # Create two columns
-    col1, col2 = st.columns([1, 2])
+    return data  # Return cleaned data for further use
+
+# Function to plot total sales by region
+def plot_total_sales_by_region(data):
+    # Clean the data
+    cleaned_data = data_cleaning(data)
     
-    # Bar chart of top 10 values
-    with col1:
-        st.write("### Top 10 ITL2 Regions by Manufacturing Value")
-        top_10 = grouped_data.nlargest(10, category)
-        fig, ax = plt.subplots()
-        ax.barh(top_10['ITL2 code'], top_10[category], color='skyblue')
-        ax.set_xlabel("Manufacturing Value")
-        ax.set_ylabel("ITL2 Code")
-        ax.invert_yaxis()
-        st.pyplot(fig)
+    # Group by region and sum the total sales
+    data_to_plot = cleaned_data.groupby(['Region'])['Total Sales($)'].sum().sort_values(ascending=True)
+
+    # Create the bar plot
+    plt.figure(figsize=(4, 2))
+    data_to_plot.plot(kind='bar', color='blue')
+
+    plt.title('Total Sales by Region')
+    plt.xlabel('Region')
+    plt.ylabel('Total Sales in Millions ($)')
     
-    # Interactive map
-    with col2:
-        st.write("### Interactive Map of Manufacturing Data")
-        m = folium.Map(location=[55.3781, -3.4360], zoom_start=6)
-        
-        # Add circles for the selected category
-        for _, row in merged.iterrows():
-            value = row[category]
-            if value > 0:
-                radius = math.sqrt(value) * 0.2  # Adjust the factor to control circle size
-                folium.CircleMarker(
-                    location=[row['geometry'].centroid.y, row['geometry'].centroid.x],
-                    radius=radius,
-                    color='red',
-                    fill=True,
-                    fill_color='red',
-                    fill_opacity=0.7,
-                    popup=f"{row['local authority: district / unitary (as of April 2023)']}<br>{category}: {value}",
-                    tooltip=f"{row['local authority: district / unitary (as of April 2023)']}<br>{category}: {value}"
-                ).add_to(m)
-        
-        folium.LayerControl().add_to(m)
-        st_folium(m, width=700, height=500)
-else:
-    st.write("Please upload both the data CSV file and the GeoJSON file to proceed.")
+    # Display the plot in Streamlit
+    st.pyplot(plt)
+
+# Function to display summary statistics
+def summary_statistics(data):
+    st.subheader("Summary Statistics")
+    st.write(data.describe())
+
+# Function to display dataset info (e.g., column types, non-null counts)
+def summary_info(data):
+    st.subheader("Summary Information")
+    buffer = StringIO()
+    data.info(buf=buffer)
+    s = buffer.getvalue()
+    st.text(s)  # Display info about the dataframe
+
+# Function to check missing data
+def missing_data(data):
+    st.subheader("Missing Data")
+    missing_values = data.isnull().sum()
+    st.write(missing_values)
+
+# Streamlit App Layout
+def main():
+    st.title("Exploratory Data Analysis (EDA)")
+
+    # File upload
+    uploaded_file = st.file_uploader("Choose a CSV file", type="csv")
+
+    if uploaded_file is not None:
+        data = pd.read_csv(uploaded_file)
+
+        selected_operations = st.multiselect(
+            "Data Exploration:", 
+            ["Data Overview", "Data Cleaning", "Data Information", "Generate Plot", "Missing Data"]
+        )
+
+        for operation in selected_operations:
+            if operation == "Data Overview": 
+                data_overview(data)
+            elif operation == "Data Cleaning": 
+                data_cleaning(data)  # Perform cleaning and show results
+            elif operation == "Data Information": 
+                summary_info(data)
+            elif operation == "Missing Data":
+                missing_data(data)
+            elif operation == "Generate Plot":
+                plot_total_sales_by_region(data)  # Generate plot for total sales by region
+
+# Run the app
+if __name__ == '__main__':
+    main()
