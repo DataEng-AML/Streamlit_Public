@@ -12,6 +12,7 @@ from langchain_openai import ChatOpenAI
 
 import logging
 import os
+from litellm import completion
 
 # Ensure folder exists
 if not os.path.exists("logs"):
@@ -68,16 +69,27 @@ class NumpyJSONEncoder(json.JSONEncoder):
     
 
 
+#class SmartMissingDataFiller:
+#    def __init__(self, model="llama2"):
+#        self.model = model
+#        self.llm_config = {
+#            "model": f"ollama/{model}",
+#            "temperature": 0.1,
+#            "base_url": "http://localhost:11434"
+#        }
+
 class SmartMissingDataFiller:
-    def __init__(self, model="llama2"):
+    def __init__(self, model="gpt-3.5-turbo"):
         self.model = model
-        self.llm_config = {
-            "model": f"ollama/{model}",
-            "temperature": 0.1,
-            "base_url": "http://localhost:11434"
-        }
-
-
+    
+    def fill(self, data):
+        response = completion(
+            model=self.model,
+            messages=[{"role": "user", "content": "Your prompt here"}],
+            api_key=st.secrets.get("OPENAI_API_KEY")
+        )
+        return response.choices[0].message.content
+        
 
 
     def create_context_agent(self):
