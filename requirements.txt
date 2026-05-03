@@ -1,0 +1,20 @@
+-r requirements_base.txt
+-r requirements_crewai.txt
+combo
+fancyimpute
+fuzzywuzzy
+geopandas
+graphviz
+phunspell
+pyenchant
+enchant
+pyod
+pyspellchecker
+pyvis
+rapidfuzz
+taipy
+torch
+ipywidgets
+pysqlite-binary
+suod
+langchain-experimental>=0.0.49

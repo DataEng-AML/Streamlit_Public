@@ -1,0 +1,14 @@
+# Force specific Pydantic version for CrewAI and ChromaDB compatibility
+pydantic>=2.4.2,<3.0.0
+typing-extensions>=4.8.0
+# Fix the looping ones
+#langchain>=0.3.0
+#langchain-community>=0.0.10
+langchain==0.2.16
+langchain-community==0.2.16
+langchain-core==0.2.43
+openai>=1.0.0
+#langchain-core>=0.3.0
+streamlit-folium>=0.21.0
+watchdog>=4.0.0
+tornado>=6.4.0

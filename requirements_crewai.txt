@@ -1,0 +1,2 @@
+# CrewAI - install separately after base requirements
+crewai
