@@ -3,3 +3,4 @@ libproj-dev
 binutils
 gdal-bin
 libgdal-dev
+enchant-2
