@@ -2091,7 +2091,9 @@ def main():
 
         st.write("This reference.")
         if pipeline.load_data() is not None:
-           st.dataframe(pipeline.load_data().head(), width='stretch')
+           #st.dataframe(pipeline.load_data().head(), width='stretch')
+           st.dataframe(pipeline.load_data().head(), use_container_width=True)
+            
            st.success(f"Working with data: {pipeline.load_data().shape[0]} rows, {pipeline.load_data().shape[1]} columns")
 
         else:
