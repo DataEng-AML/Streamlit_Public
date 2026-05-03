@@ -1,5 +1,32 @@
--r requirements_base.txt
--r requirements_crewai.txt
+setuptools
+#langchain-openai
+langchain-openai==0.1.25
+tabulate
+chardet
+folium
+inflection
+matplotlib
+missingno
+nltk
+numpy
+pandas
+plotly
+pydantic
+requests
+scikit-learn
+scipy
+seaborn
+statsmodels
+streamlit
+streamlit-extras
+streamlit-folium
+streamlit-sortables
+tqdm
+python-dotenv
+python-dateutil
+IPython
+dotenv
+crewai
 combo
 fancyimpute
 fuzzywuzzy
