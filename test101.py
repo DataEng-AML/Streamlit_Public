@@ -2067,7 +2067,8 @@ def main():
 
 
             if uploaded_file is not None:
-                st.dataframe(pipeline.load_data().head(), width='stretch')
+                #st.dataframe(pipeline.load_data().head(), width='stretch')
+                st.dataframe(pipeline.load_data().head(), use_container_width=True)
             else:
                 st.error("No file uploaded. Please upload a file to continue.")
 
