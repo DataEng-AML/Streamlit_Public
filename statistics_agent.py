@@ -314,7 +314,8 @@ class FeaturesStatisticsAgent():
         with col1:
             #st.subheader("Overall Summary")
             st.markdown(f"<h5>DataFrame Statistics Report</h5>", unsafe_allow_html=True)
-            st.dataframe(overall_summary, width='stretch')
+            #st.dataframe(overall_summary, width='stretch')
+            st.dataframe(overall_summary, use_container_width=True)
 
         with col2:
             #st.subheader("Group Summary")
