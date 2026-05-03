@@ -1,5 +1,8 @@
 #setuptools
-setuptools==81.2.0
+setuptools==81.0.0
+streamlit==1.38.0
+taipy==4.1.1
+pyenchant
 #langchain-openai
 langchain-openai==0.1.25
 tabulate
@@ -18,7 +21,7 @@ scikit-learn
 scipy
 seaborn
 statsmodels
-streamlit
+#streamlit
 streamlit-extras
 streamlit-folium
 streamlit-sortables
@@ -40,7 +43,7 @@ pyod
 pyspellchecker
 pyvis
 rapidfuzz
-taipy
+#taipy
 torch
 ipywidgets
 suod
