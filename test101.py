@@ -3405,7 +3405,7 @@ def main():
             selected_columns = st.multiselect(
                 "Select columns to standardize",
                 all_columns,
-                default=all_columns
+                default=None
             )
             
             user_prompt = st.text_input("Optional AI instructions")
