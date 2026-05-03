@@ -180,6 +180,7 @@ import taipy as tp
 from taipy import Config
 ###########################################################
 
+# HTML template for sticky containers
 # Constants for margins
 MARGINS = {
     "top": "2.875rem",
@@ -192,23 +193,18 @@ STICKY_CONTAINER_HTML = """
 div[data-testid="stVerticalBlock"] div:has(div.fixed-header-{i}) {{
     position: sticky;
     {position}: {margin};
-    background-color: var(--background-color, white);
+    background-color:white !important;
     z-index: 9999;
 }}
-div.fixed-header-{i} {{
-    border-bottom: 1px solid rgba(0,0,0,0.08);
-}}
-@media (prefers-color-scheme: dark) {{
-    div[data-testid="stVerticalBlock"] div:has(div.fixed-header-{i}) {{
-        background-color: #0e1117 !important;
-    }}
-}}
 </style>
-<div class="fixed-header-{i}"></div>
+<div class='fixed-header-{i}'/>
 """.strip()
 
+# Not to apply the same style to multiple containers
 count = 0
 
+
+# Function to create sticky containers
 def sticky_container(
     *,
     height: int | None = None,
@@ -216,14 +212,15 @@ def sticky_container(
     mode: Literal["top", "bottom"] = "top",
     margin: str | None = None,
 ):
-    global count
     if margin is None:
         margin = MARGINS[mode]
 
-    html_code = STICKY_CONTAINER_HTML.format(i=count, position=mode, margin=margin)
+
+    global count
+    html_code = STICKY_CONTAINER_HTML.format(position=mode, margin=margin, i=count)
     count += 1
 
-    container = st.container(height=height, border=border)
+    container = st.container()
     container.markdown(html_code, unsafe_allow_html=True)
     return container
 
