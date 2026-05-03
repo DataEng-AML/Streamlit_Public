@@ -44,3 +44,6 @@ torch
 ipywidgets
 suod
 langchain-experimental>=0.0.49
+litellm
+openai
+
