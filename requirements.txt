@@ -42,6 +42,5 @@ rapidfuzz
 taipy
 torch
 ipywidgets
-pysqlite-binary
 suod
 langchain-experimental>=0.0.49
