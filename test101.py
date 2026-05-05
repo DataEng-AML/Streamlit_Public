@@ -760,7 +760,7 @@ class PipelineCrewAIPyDEAML:
         st.markdown("Use the form below to manually update specific rows by index.")
 
         # Show table with indices for reference
-        st.dataframe(df[['original_feature_name', 'ai_standardized_feature']], width='stretch')
+        st.dataframe(df[['original_feature_name', 'ai_standardized_feature']], use_container_width=True)
 
         # Dynamic input for batch edits
         batch_count = st.number_input("🔢 How many edits do you want to make?", min_value=1, max_value=len(df), value=1)
@@ -779,7 +779,7 @@ class PipelineCrewAIPyDEAML:
                 if new_val:
                     df.at[idx, 'ai_standardized_feature'] = new_val
             st.success("✔️ Batch updates applied successfully!")
-            st.dataframe(df[['original_feature_name', 'ai_standardized_feature']], width='stretch')
+            st.dataframe(df[['original_feature_name', 'ai_standardized_feature']], use_container_width=True)
 
         return df   
 
@@ -1123,7 +1123,7 @@ class PipelineCrewAIPyDEAML:
                     # Create editable dataframe for unique human values only
                     edited_human_df = st.data_editor(
                         st.session_state.edited_human_values,
-                        width='stretch',
+                        use_container_width=True,
                         key="editable_unique_human_values",
                         num_rows="dynamic",
                         column_config={
@@ -1320,7 +1320,7 @@ class PipelineCrewAIPyDEAML:
         #         # Create editable table for manual corrections (unique values only)
         #         editable_manual_df = st.data_editor(
         #             st.session_state.manual_standard_names_df,
-        #             width='stretch',
+        #             use_container_width=True,
         #             key="editable_manual_values",
         #             num_rows="dynamic",
         #             column_config={
@@ -2067,7 +2067,7 @@ def main():
 
 
             if uploaded_file is not None:
-                #st.dataframe(pipeline.load_data().head(), width='stretch')
+                #st.dataframe(pipeline.load_data().head(), use_container_width=True)
                 st.dataframe(pipeline.load_data().head(), use_container_width=True)
             else:
                 st.error("No file uploaded. Please upload a file to continue.")
@@ -2092,7 +2092,7 @@ def main():
 
         st.write("This reference.")
         if pipeline.load_data() is not None:
-           #st.dataframe(pipeline.load_data().head(), width='stretch')
+           #st.dataframe(pipeline.load_data().head(), use_container_width=True)
            st.dataframe(pipeline.load_data().head(), use_container_width=True)
             
            st.success(f"Working with data: {pipeline.load_data().shape[0]} rows, {pipeline.load_data().shape[1]} columns")
@@ -2493,7 +2493,7 @@ def main():
 
                                 
                                 fig.update_layout(width=width*50, height=height*50)
-                                st.plotly_chart(fig, width='stretch')
+                                st.plotly_chart(fig, use_container_width=True)
                         
                             except Exception as e:
                                 st.error(f"Could not generate {chart_type}. Please ensure you have selected the correct columns for this format.")
@@ -2582,7 +2582,7 @@ def main():
                     st.success("✅ Transformed DataFrame Activated!")
                     st.dataframe(st.session_state.df)
 
-                #if st.button("Confirm Transformation", width='stretch', key="confirm_trnfm_btn"):
+                #if st.button("Confirm Transformation", use_container_width=True, key="confirm_trnfm_btn"):
                     st.success("✅ Transformed DataFrame Activated!")
                     st.write(f"Shape: Old df: {original_df.shape}, New df: {st.session_state.df.shape}")
 
@@ -2591,7 +2591,7 @@ def main():
 
 
             with col2:
-                if st.button("Revert to Old DataFrame", width='stretch', key="reset_trnfm_df_btn"):
+                if st.button("Revert to Old DataFrame", use_container_width=True, key="reset_trnfm_df_btn"):
                     st.session_state.df = original_df
                     st.write(original_df.shape)
                     st.markdown("##### Active Dataframe")
@@ -4105,7 +4105,7 @@ def main():
                     st.dataframe(st.session_state.df)
 
             with col2:
-                if st.button("Revert to Old DataFrame", width='stretch', key="reset_trnfm_df_btn"):
+                if st.button("Revert to Old DataFrame", use_container_width=True, key="reset_trnfm_df_btn"):
                     st.session_state.df = original_df
                     st.write(original_df.shape)
 
@@ -4508,7 +4508,7 @@ def main():
                         st.session_state.standard_names_df[
                             ['original_feature_name', 'inflection_standardized_feature', 'ai_standardized_feature']
                         ],
-                        width='stretch',
+                        use_container_width=True,
                         key=f"Inflection AI Standard Feature Name_None_editable_ai_features"
                     )
 
@@ -4711,7 +4711,7 @@ def main():
                 # Create editable table for manual corrections (unique values only)
                 editable_manual_df = st.data_editor(
                     st.session_state.manual_standard_names_df,
-                    width='stretch',
+                    use_container_width=True,
                     key="editable_manual_values",
                     num_rows="dynamic",
                     column_config={
@@ -6904,7 +6904,7 @@ def main():
                     data=data,
                     file_name=final_filename,
                     mime=mime_type,
-                    #width='stretch',
+                    #use_container_width=True,
                     help=f"Download as {selected_format} format",
                     key=f"download_{selected_format}_{timestamp}"
                 )
