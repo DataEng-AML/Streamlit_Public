@@ -74,7 +74,7 @@ class FeaturesEngineeringAgent():
                     message_to_show = ""
 
                     with col1:
-                        if st.button("Remove Duplicates", width='stretch'):
+                        if st.button("Remove Duplicates", use_container_width=True):
                             # Always remove duplicates from the ORIGINAL dataframe
                             df_dedup = raw_data.drop_duplicates()
                             df_to_show = df_dedup.head()
@@ -84,7 +84,7 @@ class FeaturesEngineeringAgent():
                             message_to_show = f"There were **:red[{len(raw_data)}]** records before duplicate removal, and **:green[{len(df_dedup)}]** records after duplicate removal. Removed {len(raw_data) - len(df_dedup)} duplicate rows."
                     
                     with col2:
-                        if st.button("Revert Duplicate Removal", key="revert_duplicate_button", width='stretch'):
+                        if st.button("Revert Duplicate Removal", key="revert_duplicate_button", use_container_width=True):
                             # Always revert to the ORIGINAL dataframe
                             current_df = raw_data
                             st.session_state.df = raw_data
@@ -318,7 +318,7 @@ class FeaturesEngineeringAgent():
                     
                         # CREATE NEW FEATURE BUTTON
                         #st.markdown("---")
-                        if st.button("Create New Feature", type="primary", width='stretch'):
+                        if st.button("Create New Feature", type="primary", use_container_width=True):
                             if not new_feature_name:
                                 st.error("Please enter a new feature name!")
                                 # Before creating new feature, check for duplicates
