@@ -270,7 +270,7 @@ class FeaturesStatisticsAgent():
             fig = self.feature_bar_chart(feature_data)
             col5.markdown("<br>" * 2, unsafe_allow_html=True)
             # Add unique key to prevent duplicate element ID errors
-            col5.plotly_chart(fig, width='stretch', key=f"chart_{feature_data['column']}_{id(df)}")
+            col5.plotly_chart(fig, use_container_width=True, key=f"chart_{feature_data['column']}_{id(df)}")
 
             st.markdown("---")
 
@@ -320,7 +320,7 @@ class FeaturesStatisticsAgent():
         with col2:
             #st.subheader("Group Summary")
             st.markdown(f"<h5>Combined Statistics Report</h5>", unsafe_allow_html=True)
-            st.dataframe(group_summary_df, width='stretch')
+            st.dataframe(group_summary_df, use_container_width=True)
 
         return overall_summary, group_summary_df
 
