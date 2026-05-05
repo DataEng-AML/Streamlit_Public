@@ -4,8 +4,8 @@ streamlit==1.38.0
 taipy==4.1.1
 pyenchant
 #langchain-openai
-#langchain-openai==0.1.25
-langchain-openai >= 1.1.14
+langchain-openai==0.1.25
+#langchain-openai >= 1.1.14
 #(requires langchain-core >= 1.2.31)
 tabulate
 chardet
